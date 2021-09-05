@@ -15,8 +15,9 @@ import javax.imageio.ImageIO;
 
 public class BitmapFont {
 
-	private static final int UNICODE_MIN_START = 32; // SPACE
-	private static final int UNICODE_MAX_END = 127; // TILDE (no ANSI)
+	// --------------------------------------
+	// Variables
+	// --------------------------------------
 
 	private BitmapFontOptions mFontOptions;
 	private Font mFont;
@@ -24,42 +25,20 @@ public class BitmapFont {
 	private boolean mOptionsLoaded;
 	private boolean mIsLoaded;
 
+	// --------------------------------------
+	// Constructor
+	// --------------------------------------
+
 	public BitmapFont(BitmapFontOptions pInputOptions) {
 		mFontOptions = pInputOptions;
-
-		validateInputOptions(pInputOptions);
 		mIsLoaded = false;
 	}
 
-	private boolean validateInputOptions(BitmapFontOptions pInputOptions) {
-		if (pInputOptions.fontFilepath == null || pInputOptions.fontFilepath.length() == 0) {
-			System.out.println("fontFilepath is null or empty");
-			return false;
-		}
-
-		if (pInputOptions.bitmapName == null || pInputOptions.bitmapName.length() == 0) {
-			System.out.println("Bitmapname is null or empty");
-			return false;
-		}
-
-		if (pInputOptions.unicodeStartCode < UNICODE_MIN_START) {
-			pInputOptions.unicodeStartCode = UNICODE_MIN_START;
-		}
-
-		if (pInputOptions.unicodeEndCode > UNICODE_MAX_END) {
-			pInputOptions.unicodeEndCode = UNICODE_MAX_END;
-		}
-
-		mOptionsLoaded = true;
-		return true;
-	}
+	// --------------------------------------
+	// Methods
+	// --------------------------------------
 
 	public void LoadFont() {
-		if (mOptionsLoaded == false) {
-			System.out.println("There was a problem parsing the input arguments");
-			return;
-		}
-
 		File lFontFile = new File(mFontOptions.fontFilepath);
 		if (lFontFile.exists() == false) {
 			System.out.println("Font file doesn't exist : " + mFontOptions.fontFilepath);

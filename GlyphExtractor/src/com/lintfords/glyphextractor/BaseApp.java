@@ -9,40 +9,58 @@ import org.apache.commons.cli.ParseException;
 
 public class BaseApp {
 
+	// --------------------------------------
+	// Entry Point
+	// --------------------------------------
+
 	public static void main(String[] args) {
-		Options options = new Options();
-		options.addOption(BitmapFontOptions.CLI_OPTION_FILEPATH, true, "path to the font file");
-		options.addOption(BitmapFontOptions.CLI_OPTION_BITMAPNAME, true, "name of bitmap");
-		options.addOption(BitmapFontOptions.CLI_OPTION_POINTSIZE, true, "point size");
-		options.addOption(BitmapFontOptions.CLI_OPTION_GLYPH_BORDER, true, "glyph border size");
-		options.addOption(BitmapFontOptions.CLI_OPTION_RANGE_START, true, "character start range");
-		options.addOption(BitmapFontOptions.CLI_OPTION_RANGE_END, true, "charcter end range");
+		Options lCliOptions = new Options();
+		lCliOptions.addOption(BitmapFontOptions.CLI_OPTION_FILEPATH, true, "path to the font file");
+		lCliOptions.addOption(BitmapFontOptions.CLI_OPTION_BITMAPNAME, true, "name of bitmap");
+		lCliOptions.addOption(BitmapFontOptions.CLI_OPTION_POINTSIZE, true, "point size");
+		lCliOptions.addOption(BitmapFontOptions.CLI_OPTION_GLYPH_BORDER, true, "glyph border size");
+		lCliOptions.addOption(BitmapFontOptions.CLI_OPTION_RANGE_START, true, "character start range");
+		lCliOptions.addOption(BitmapFontOptions.CLI_OPTION_RANGE_END, true, "charcter end range");
 
 		CommandLineParser parser = new DefaultParser();
 		CommandLine cmd = null;
 
 		try {
-			cmd = parser.parse(options, args);
+			cmd = parser.parse(lCliOptions, args);
 		} catch (ParseException e) {
 			e.printStackTrace();
 
-			printAppUsage(options);
+			printAppUsage(lCliOptions);
 
 			return;
 		}
 
-		new BaseApp(cmd);
+		BitmapFontOptions lBitmapOptions = BitmapFontOptions.fromCmdLine(cmd);
+
+		if (BitmapFontOptions.validateInputOptions(lBitmapOptions) == false) {
+			printAppUsage(lCliOptions);
+			return;
+		}
+
+		new BaseApp(lBitmapOptions);
 	}
+
+	// --------------------------------------
+	// Methods
+	// --------------------------------------
 
 	private static void printAppUsage(Options opts) {
 		HelpFormatter formatter = new HelpFormatter();
 		formatter.printHelp("GlyphExporter", opts);
 	}
 
-	public BaseApp(CommandLine cli) {
-		BitmapFontOptions options = BitmapFontOptions.fromCmdLine(cli);
+	// --------------------------------------
+	// Constructor
+	// --------------------------------------
 
-		BitmapFont lBitmapFont = new BitmapFont(options);
+	public BaseApp(BitmapFontOptions pBitmapOptions) {
+
+		BitmapFont lBitmapFont = new BitmapFont(pBitmapOptions);
 		lBitmapFont.LoadFont();
 		lBitmapFont.exportGlyphsToFiles();
 	}
