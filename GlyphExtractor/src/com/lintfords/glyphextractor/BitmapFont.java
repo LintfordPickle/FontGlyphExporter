@@ -22,7 +22,6 @@ public class BitmapFont {
 	private BitmapFontOptions mFontOptions;
 	private Font mFont;
 
-	private boolean mOptionsLoaded;
 	private boolean mIsLoaded;
 
 	// --------------------------------------

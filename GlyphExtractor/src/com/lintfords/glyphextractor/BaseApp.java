@@ -14,6 +14,8 @@ public class BaseApp {
 	// --------------------------------------
 
 	public static void main(String[] args) {
+		printAppHeader();
+
 		Options lCliOptions = new Options();
 		lCliOptions.addOption(BitmapFontOptions.CLI_OPTION_FILEPATH, true, "path to the font file");
 		lCliOptions.addOption(BitmapFontOptions.CLI_OPTION_BITMAPNAME, true, "name of bitmap");
@@ -48,6 +50,11 @@ public class BaseApp {
 	// --------------------------------------
 	// Methods
 	// --------------------------------------
+
+	private static void printAppHeader() {
+		System.out.println(AppConstants.AppName + " " + AppConstants.Version);
+		System.out.println("Developed by " + AppConstants.Author + ", " + AppConstants.Date);
+	}
 
 	private static void printAppUsage(Options opts) {
 		HelpFormatter formatter = new HelpFormatter();
