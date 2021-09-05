@@ -49,6 +49,18 @@ public class BitmapFontOptions {
 	// Methods
 	// --------------------------------------
 
+	public static BitmapFontOptions fromArguments(String pFilepath, String pBitmapName, float pPointSize, int pUnicodeStartPoint, int pUnicodeEndPoint, int pGlyphBorderSize) {
+		BitmapFontOptions newBitmapFontOptions = new BitmapFontOptions();
+		newBitmapFontOptions.fontFilepath = pFilepath;
+		newBitmapFontOptions.bitmapName = pBitmapName;
+		newBitmapFontOptions.pointSize = pPointSize;
+		newBitmapFontOptions.unicodeStartCode = pUnicodeStartPoint;
+		newBitmapFontOptions.unicodeEndCode = pUnicodeEndPoint;
+		newBitmapFontOptions.glyphBorderSize = pGlyphBorderSize;
+
+		return newBitmapFontOptions;
+	}
+
 	public static BitmapFontOptions fromCmdLine(CommandLine pCli) {
 		BitmapFontOptions newBitmapFontOptions = new BitmapFontOptions();
 		newBitmapFontOptions.fontFilepath = pCli.getOptionValue(CLI_OPTION_FILEPATH);
