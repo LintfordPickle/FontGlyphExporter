@@ -7,7 +7,7 @@ public class AppConstants {
 	public static final String Date = "06.09.2021";
 
 	public static final int VERSION_MAJOR = 0;
-	public static final int VERSION_MINOR = 1;
+	public static final int VERSION_MINOR = 2;
 	public static final int VERSION_PATCH = 0;
 
 	public static final String Version = String.format("v%d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);

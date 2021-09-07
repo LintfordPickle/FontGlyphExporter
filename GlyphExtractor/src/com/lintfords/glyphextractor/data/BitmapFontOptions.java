@@ -1,4 +1,4 @@
-package com.lintfords.glyphextractor;
+package com.lintfords.glyphextractor.data;
 
 import org.apache.commons.cli.CommandLine;
 
@@ -22,12 +22,17 @@ public class BitmapFontOptions {
 	// Variables
 	// --------------------------------------
 
+	public String fillColorHex;
+	public String outlineColorHex;
 	public String fontFilepath;
-	public String bitmapName;
-	public float pointSize;
-	public int glyphBorderSize;
+	public String outputFolder;
+	public int pointSize;
+	public int spritePadding;
+	public int outlineSize;
 	public int unicodeStartCode;
 	public int unicodeEndCode;
+	public boolean useHexIdentifier;
+	public boolean useAntiAliasing;
 
 	private static int DEFAULT_POINT_SIZE = 16;
 	private static int DEFAULT_UNICODE_START_CODE = 32;
@@ -37,26 +42,27 @@ public class BitmapFontOptions {
 	// Constructor
 	// --------------------------------------
 
-	private BitmapFontOptions() {
-		bitmapName = "unnamed";
+	public BitmapFontOptions() {
+		outputFolder = "unnamed";
 		unicodeStartCode = 30;
 		unicodeEndCode = 127;
-		glyphBorderSize = 1;
+		spritePadding = 1;
 		pointSize = 16;
+		useHexIdentifier = true;
 	}
 
 	// --------------------------------------
 	// Methods
 	// --------------------------------------
 
-	public static BitmapFontOptions fromArguments(String pFilepath, String pBitmapName, float pPointSize, int pUnicodeStartPoint, int pUnicodeEndPoint, int pGlyphBorderSize) {
+	public static BitmapFontOptions fromArguments(String pFilepath, String pBitmapName, int pPointSize, int pUnicodeStartPoint, int pUnicodeEndPoint, int pGlyphBorderSize) {
 		BitmapFontOptions newBitmapFontOptions = new BitmapFontOptions();
 		newBitmapFontOptions.fontFilepath = pFilepath;
-		newBitmapFontOptions.bitmapName = pBitmapName;
+		newBitmapFontOptions.outputFolder = pBitmapName;
 		newBitmapFontOptions.pointSize = pPointSize;
 		newBitmapFontOptions.unicodeStartCode = pUnicodeStartPoint;
 		newBitmapFontOptions.unicodeEndCode = pUnicodeEndPoint;
-		newBitmapFontOptions.glyphBorderSize = pGlyphBorderSize;
+		newBitmapFontOptions.spritePadding = pGlyphBorderSize;
 
 		return newBitmapFontOptions;
 	}
@@ -64,11 +70,11 @@ public class BitmapFontOptions {
 	public static BitmapFontOptions fromCmdLine(CommandLine pCli) {
 		BitmapFontOptions newBitmapFontOptions = new BitmapFontOptions();
 		newBitmapFontOptions.fontFilepath = pCli.getOptionValue(CLI_OPTION_FILEPATH);
-		newBitmapFontOptions.bitmapName = pCli.getOptionValue(CLI_OPTION_BITMAPNAME);
-		newBitmapFontOptions.pointSize = tryGetFloat(pCli.getOptionValue(CLI_OPTION_POINTSIZE), DEFAULT_POINT_SIZE);
+		newBitmapFontOptions.outputFolder = pCli.getOptionValue(CLI_OPTION_BITMAPNAME);
+		newBitmapFontOptions.pointSize = tryGetInt(pCli.getOptionValue(CLI_OPTION_POINTSIZE), DEFAULT_POINT_SIZE);
 		newBitmapFontOptions.unicodeStartCode = tryGetInt(pCli.getOptionValue(CLI_OPTION_RANGE_START), DEFAULT_UNICODE_START_CODE);
 		newBitmapFontOptions.unicodeEndCode = tryGetInt(pCli.getOptionValue(CLI_OPTION_RANGE_END), DEFAULT_UNICODE_END_CODE);
-		newBitmapFontOptions.glyphBorderSize = tryGetInt(pCli.getOptionValue(CLI_OPTION_GLYPH_BORDER), 1);
+		newBitmapFontOptions.spritePadding = tryGetInt(pCli.getOptionValue(CLI_OPTION_GLYPH_BORDER), 1);
 
 		return newBitmapFontOptions;
 	}
@@ -79,7 +85,7 @@ public class BitmapFontOptions {
 			return false;
 		}
 
-		if (pInputOptions.bitmapName == null || pInputOptions.bitmapName.length() == 0) {
+		if (pInputOptions.outputFolder == null || pInputOptions.outputFolder.length() == 0) {
 			System.out.println("Bitmapname is null or empty");
 			return false;
 		}
@@ -93,20 +99,6 @@ public class BitmapFontOptions {
 		}
 
 		return true;
-	}
-
-	private static float tryGetFloat(String pCliValue, float pDefValue) {
-		if (pCliValue == null || pCliValue.length() == 0)
-			return pDefValue;
-
-		try {
-			final float lParsedFloat = Float.valueOf(pCliValue);
-			return lParsedFloat;
-		} catch (Exception e) {
-			System.out.println("NumberFormatException thrown whilst parsing argument " + pCliValue);
-		}
-
-		return pDefValue;
 	}
 
 	private static int tryGetInt(String pCliValue, int pDefValue) {

@@ -7,6 +7,8 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import com.lintfords.glyphextractor.data.BitmapFontOptions;
+
 public class BaseApp {
 
 	// --------------------------------------
@@ -14,6 +16,21 @@ public class BaseApp {
 	// --------------------------------------
 
 	public static void main(String[] args) {
+		if (args == null || args.length == 0) {
+			startGui();
+		} else {
+			startCli(args);
+		}
+	}
+
+	// --------------------------------------
+
+	private static void startGui() {
+		GuiApp lApp = new GuiApp();
+		lApp.createWindow();
+	}
+
+	private static void startCli(String[] args) {
 		printAppHeader();
 
 		Options lCliOptions = new Options();
@@ -38,13 +55,14 @@ public class BaseApp {
 		}
 
 		BitmapFontOptions lBitmapOptions = BitmapFontOptions.fromCmdLine(cmd);
+		lBitmapOptions.outlineSize = 2;
 
 		if (BitmapFontOptions.validateInputOptions(lBitmapOptions) == false) {
 			printAppUsage(lCliOptions);
 			return;
 		}
 
-		new BaseApp(lBitmapOptions);
+		new ConsoleApp(lBitmapOptions);
 	}
 
 	// --------------------------------------
@@ -61,14 +79,4 @@ public class BaseApp {
 		formatter.printHelp("GlyphExporter", opts);
 	}
 
-	// --------------------------------------
-	// Constructor
-	// --------------------------------------
-
-	public BaseApp(BitmapFontOptions pBitmapOptions) {
-
-		BitmapFont lBitmapFont = new BitmapFont(pBitmapOptions);
-		lBitmapFont.LoadFont();
-		lBitmapFont.exportGlyphsToFiles();
-	}
 }

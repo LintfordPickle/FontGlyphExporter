@@ -6,11 +6,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import com.lintfords.glyphextractor.data.BitmapFontOptions;
+
 class BitmapFontOptionsTests {
 
 	private String mFontFilepath;
 	private String mBitmapName;
-	private float mPointSize;
+	private int mPointSize;
 	private int mUnicodeStartingPoint;
 	private int mUnicodeEndingPoint;
 	private int mGlyphBorderSize;
@@ -21,7 +23,7 @@ class BitmapFontOptionsTests {
 	void setUp() {
 		mFontFilepath = "res//fonts//arial.ttf";
 		mBitmapName = "test_bitmap";
-		mPointSize = 16f;
+		mPointSize = 16;
 		mUnicodeStartingPoint = 32;
 		mUnicodeEndingPoint = 127;
 		mGlyphBorderSize = 1;
@@ -33,11 +35,11 @@ class BitmapFontOptionsTests {
 	@DisplayName("The FromArguments method correctly maps the actual arguments to the correct fields")
 	void On_FromArguments_Parameters_Return_Correctly() {
 		assertTrue(mOptions.fontFilepath.equals(mFontFilepath));
-		assertTrue(mOptions.bitmapName.equals(mBitmapName));
+		assertTrue(mOptions.outputFolder.equals(mBitmapName));
 		assertTrue(mOptions.pointSize == mPointSize);
 		assertTrue(mOptions.unicodeStartCode == mUnicodeStartingPoint);
 		assertTrue(mOptions.unicodeEndCode == mUnicodeEndingPoint);
-		assertTrue(mOptions.glyphBorderSize == mGlyphBorderSize);
+		assertTrue(mOptions.spritePadding == mGlyphBorderSize);
 	}
 
 	@Test
