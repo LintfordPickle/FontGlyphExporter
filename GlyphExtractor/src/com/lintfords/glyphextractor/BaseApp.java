@@ -11,6 +11,8 @@ import com.lintfords.glyphextractor.data.BitmapFontOptions;
 
 public class BaseApp {
 
+	public static final String CLI_OPTION_CONFIGURATION_FILE = "c";
+
 	// --------------------------------------
 	// Entry Point
 	// --------------------------------------
@@ -40,6 +42,7 @@ public class BaseApp {
 		lCliOptions.addOption(BitmapFontOptions.CLI_OPTION_GLYPH_BORDER, true, "glyph border size");
 		lCliOptions.addOption(BitmapFontOptions.CLI_OPTION_RANGE_START, true, "character start range");
 		lCliOptions.addOption(BitmapFontOptions.CLI_OPTION_RANGE_END, true, "charcter end range");
+		lCliOptions.addOption(CLI_OPTION_CONFIGURATION_FILE, true, "Load configuration from file");
 
 		CommandLineParser parser = new DefaultParser();
 		CommandLine cmd = null;
@@ -54,8 +57,19 @@ public class BaseApp {
 			return;
 		}
 
+		if (cmd.hasOption(CLI_OPTION_CONFIGURATION_FILE)) {
+			String lConfigurationFile = cmd.getOptionValue(CLI_OPTION_CONFIGURATION_FILE);
+			BitmapFontOptions lBitmapOptions = BitmapFontOptions.fromConfigrationFile(lConfigurationFile);
+			if (BitmapFontOptions.validateInputOptions(lBitmapOptions) == false) {
+				System.out.println("Failed to validate the configuration file");
+				return;
+			}
+
+			new ConsoleApp(lBitmapOptions);
+			return;
+		}
+
 		BitmapFontOptions lBitmapOptions = BitmapFontOptions.fromCmdLine(cmd);
-		lBitmapOptions.outlineSize = 2;
 
 		if (BitmapFontOptions.validateInputOptions(lBitmapOptions) == false) {
 			printAppUsage(lCliOptions);

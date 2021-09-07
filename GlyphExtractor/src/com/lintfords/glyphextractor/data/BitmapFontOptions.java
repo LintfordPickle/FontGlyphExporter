@@ -1,6 +1,13 @@
 package com.lintfords.glyphextractor.data;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+
 import org.apache.commons.cli.CommandLine;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class BitmapFontOptions {
 
@@ -54,6 +61,34 @@ public class BitmapFontOptions {
 	// --------------------------------------
 	// Methods
 	// --------------------------------------
+
+	public static BitmapFontOptions fromConfigrationFile(String pFilepath) {
+		File lConfigurationFile = new File(pFilepath);
+		if (lConfigurationFile.exists() == false) {
+			return null;
+		}
+
+		final Gson lGson = new GsonBuilder().create();
+		FileReader lFileContents;
+		BitmapFontOptions lLoadedOptionsFile = null;
+		try {
+			lFileContents = new FileReader(lConfigurationFile);
+			lLoadedOptionsFile = lGson.fromJson(lFileContents, BitmapFontOptions.class);
+
+			if (lLoadedOptionsFile == null) {
+				System.out.println("Failed to load configuration file");
+			}
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		if (lLoadedOptionsFile == null) {
+			return null;
+		}
+
+		return lLoadedOptionsFile;
+	}
 
 	public static BitmapFontOptions fromArguments(String pFilepath, String pBitmapName, int pPointSize, int pUnicodeStartPoint, int pUnicodeEndPoint, int pGlyphBorderSize) {
 		BitmapFontOptions newBitmapFontOptions = new BitmapFontOptions();
