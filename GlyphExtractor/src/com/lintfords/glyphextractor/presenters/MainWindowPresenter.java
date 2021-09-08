@@ -1,6 +1,7 @@
 package com.lintfords.glyphextractor.presenters;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -16,12 +17,19 @@ import com.lintfords.glyphextractor.views.MainWindow;
 public class MainWindowPresenter implements IMainPresenter {
 
 	// --------------------------------------
+	// Constants
+	// --------------------------------------
+
+	private static final String CONFIGURATION_EXTENSION = ".GEC";
+
+	// --------------------------------------
 	// Variables
 	// --------------------------------------
 
 	private MainWindow mMainWindow;
 	private BitmapFontOptions mBitmapFontOptions;
 	private BitmapFont mBitmapFont;
+	private int mPreviewChar;
 
 	// --------------------------------------
 	// Constructor
@@ -31,7 +39,7 @@ public class MainWindowPresenter implements IMainPresenter {
 		mMainWindow = pMainWindow;
 
 		mBitmapFont = pBitmapFont;
-		mBitmapFontOptions = pBitmapFont.bitmapFontOptions();
+		mBitmapFontOptions = new BitmapFontOptions();
 	}
 
 	// --------------------------------------
@@ -41,12 +49,23 @@ public class MainWindowPresenter implements IMainPresenter {
 	// OPTIONS ------------------------------
 
 	@Override
+	public void setPreviewCharacter(int pNewPreviewChar) {
+		if (mPreviewChar != pNewPreviewChar) {
+			mPreviewChar = pNewPreviewChar;
+
+			validateAndPreview();
+		}
+	}
+
+	@Override
 	public void setFontFilepath(File pNewFontFile) {
 		if (pNewFontFile.exists() && pNewFontFile.isFile()) {
 			if (mBitmapFontOptions.fontFilepath != pNewFontFile.getAbsolutePath()) {
 				mBitmapFontOptions.fontFilepath = pNewFontFile.getAbsolutePath();
 				mMainWindow.setFontFilename(pNewFontFile.getAbsolutePath());
 				mMainWindow.setStatusText("Font Filename Set");
+
+				validateAndPreview();
 			}
 		}
 	}
@@ -65,6 +84,8 @@ public class MainWindowPresenter implements IMainPresenter {
 		if (mBitmapFontOptions.pointSize != pNewPointSize) {
 			mBitmapFontOptions.pointSize = pNewPointSize;
 			mMainWindow.setStatusText("Point Size Set : " + pNewPointSize);
+
+			validateAndPreview();
 		}
 	}
 
@@ -81,6 +102,8 @@ public class MainWindowPresenter implements IMainPresenter {
 		if (mBitmapFontOptions.useAntiAliasing != pNewValue) {
 			mBitmapFontOptions.useAntiAliasing = pNewValue;
 			mMainWindow.setStatusText("Anti-Aliasing Set : " + pNewValue);
+
+			validateAndPreview();
 		}
 	}
 
@@ -89,6 +112,8 @@ public class MainWindowPresenter implements IMainPresenter {
 		if (mBitmapFontOptions.spritePadding != pNewSpritePadding) {
 			mBitmapFontOptions.spritePadding = pNewSpritePadding;
 			mMainWindow.setStatusText("Sprite Padding set : " + pNewSpritePadding);
+
+			validateAndPreview();
 		}
 	}
 
@@ -116,6 +141,8 @@ public class MainWindowPresenter implements IMainPresenter {
 		if (mBitmapFontOptions.outlineSize != pOutlineWidth) {
 			mBitmapFontOptions.outlineSize = pOutlineWidth;
 			mMainWindow.setStatusText("Outline glyph width updated to " + (pOutlineWidth > 0 ? pOutlineWidth : "off"));
+
+			validateAndPreview();
 		}
 	}
 
@@ -132,10 +159,14 @@ public class MainWindowPresenter implements IMainPresenter {
 			if (mBitmapFontOptions.fillColorHex != pNewFillColorHex) {
 				mBitmapFontOptions.fillColorHex = pNewFillColorHex;
 				mMainWindow.setStatusText("Updated fill color : " + pNewFillColorHex);
+
+				validateAndPreview();
 			}
 		} else {
 			mBitmapFontOptions.fillColorHex = "#000000FF";
 			mMainWindow.setStatusText("Error setting fill color. Invalid hex code (try #000000FF)");
+
+			validateAndPreview();
 		}
 	}
 
@@ -152,21 +183,44 @@ public class MainWindowPresenter implements IMainPresenter {
 			if (mBitmapFontOptions.outlineColorHex != pNewOutlineColorHex) {
 				mBitmapFontOptions.outlineColorHex = pNewOutlineColorHex;
 				mMainWindow.setStatusText("Updated fill color : " + pNewOutlineColorHex);
+
+				validateAndPreview();
 			}
 		} else {
 			mBitmapFontOptions.outlineColorHex = "#FFFFFFFF";
 			mMainWindow.setStatusText("Error setting fill color. Invalid hex code (try #000000FF)");
+
+			validateAndPreview();
 		}
 	}
 
 	// TODO: Refactor (used twice)
 	private static Color hex2Rgb(String colorStr) {
-		return new Color(Integer.valueOf(colorStr.substring(1, 3), 16), Integer.valueOf(colorStr.substring(3, 5), 16), Integer.valueOf(colorStr.substring(5, 7), 16), Integer.valueOf(colorStr.substring(7, 9), 16));
+		try {
+			return new Color(Integer.valueOf(colorStr.substring(1, 3), 16), Integer.valueOf(colorStr.substring(3, 5), 16), Integer.valueOf(colorStr.substring(5, 7), 16), Integer.valueOf(colorStr.substring(7, 9), 16));
+		} catch (NumberFormatException ex) {
+			return Color.magenta;
+		}
+	}
+
+	public BitmapFontOptions getBitmapFontOptions() {
+		return mBitmapFontOptions;
+	}
+
+	public void resetOptions() {
+		mBitmapFontOptions.reset();
+	}
+
+	private void validateAndPreview() {
+		if (BitmapFontOptions.validateInputOptions(mBitmapFontOptions)) {
+			mBitmapFont.LoadFont(mBitmapFontOptions);
+			BufferedImage lGlyphImage = mBitmapFont.createGlyphImage((char) mPreviewChar);
+
+			mMainWindow.setImagePreview(lGlyphImage);
+		}
 	}
 
 	// --------------------------------------
-
-	private static final String CONFIGURATION_EXTENSION = ".GEC";
 
 	@Override
 	public String enforceConfigurationFileExtension(String pFilename) {
@@ -185,7 +239,6 @@ public class MainWindowPresenter implements IMainPresenter {
 			return;
 
 		mBitmapFont.LoadFont(mBitmapFontOptions);
-
 		mBitmapFont.exportGlyphsToFiles();
 	}
 

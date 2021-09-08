@@ -55,12 +55,28 @@ public class BitmapFontOptions {
 		unicodeEndCode = 127;
 		spritePadding = 1;
 		pointSize = 16;
+		fillColorHex = "#FFFFFFFF";
+		outlineColorHex = "#000000FF";
 		useHexIdentifier = true;
 	}
 
 	// --------------------------------------
 	// Methods
 	// --------------------------------------
+
+	public void reset() {
+		fillColorHex = "#FFFFFFFF";
+		outlineColorHex = "#000000FF";
+		fontFilepath = "";
+		outputFolder = "";
+		pointSize = 16;
+		spritePadding = 1;
+		outlineSize = 2;
+		unicodeStartCode = 32;
+		unicodeEndCode = 127;
+		useHexIdentifier = false;
+		useAntiAliasing = true;
+	}
 
 	public static BitmapFontOptions fromConfigrationFile(String pFilepath) {
 		File lConfigurationFile = new File(pFilepath);
@@ -117,11 +133,6 @@ public class BitmapFontOptions {
 	public static boolean validateInputOptions(BitmapFontOptions pInputOptions) {
 		if (pInputOptions.fontFilepath == null || pInputOptions.fontFilepath.length() == 0) {
 			System.out.println("fontFilepath is null or empty");
-			return false;
-		}
-
-		if (pInputOptions.outputFolder == null || pInputOptions.outputFolder.length() == 0) {
-			System.out.println("Bitmapname is null or empty");
 			return false;
 		}
 

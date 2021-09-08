@@ -109,7 +109,7 @@ public class BitmapFont {
 				hexValue = String.valueOf((int) c);
 			}
 
-			BufferedImage lGlyphImage = createGlyphImage(mFont, c);
+			BufferedImage lGlyphImage = createGlyphImage(c);
 			saveGlyphToFile(lGlyphImage, hexValue);
 
 			numGlyphsExported++;
@@ -133,19 +133,22 @@ public class BitmapFont {
 		}
 	}
 
-	private BufferedImage createGlyphImage(Font pFont, char currentCharacter) {
+	public BufferedImage createGlyphImage(char currentCharacter) {
+		if (mIsLoaded == false)
+			return null;
+
 		BufferedImage lImage = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D graphics2D = lImage.createGraphics();
 
-		graphics2D.setFont(pFont);
+		graphics2D.setFont(mFont);
 		FontMetrics lFontMetrics = graphics2D.getFontMetrics();
 
 		final int lGlyphBorder = mFontOptions.spritePadding;
 
 		final int lOutlineWidth = (int) Math.ceil(mFontOptions.outlineSize);
 
-		int charWidth = lFontMetrics.charWidth(currentCharacter) + lGlyphBorder * 2 + lOutlineWidth*2;
-		int charHeight = lFontMetrics.getHeight() + lGlyphBorder * 2 + lOutlineWidth*2;
+		int charWidth = lFontMetrics.charWidth(currentCharacter) + lGlyphBorder * 2 + lOutlineWidth * 2;
+		int charHeight = lFontMetrics.getHeight() + lGlyphBorder * 2 + lOutlineWidth * 2;
 
 		// create a glyph vector from your text
 		GlyphVector glyphVector = mFont.createGlyphVector(graphics2D.getFontRenderContext(), String.valueOf(currentCharacter));
@@ -154,30 +157,31 @@ public class BitmapFont {
 
 		lImage = new BufferedImage(charWidth, charHeight, BufferedImage.TYPE_INT_ARGB);
 		graphics2D = lImage.createGraphics();
-		graphics2D.setFont(pFont);
-		BasicStroke outlineStroke = new BasicStroke(lOutlineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+		graphics2D.setFont(mFont);
 
-		graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, mFontOptions.useAntiAliasing ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
 		graphics2D.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-
+		
 		graphics2D.translate(lGlyphBorder + lOutlineWidth, lGlyphBorder + lFontMetrics.getAscent() + lOutlineWidth);
 
 		// Draw outline
-		Color lOutlineColor = hex2Rgba(mFontOptions.outlineColorHex);
-		if (lOutlineColor == null) {
-			lOutlineColor = Color.black;
-		}
-		graphics2D.setColor(lOutlineColor);
-		graphics2D.setStroke(outlineStroke);
-		graphics2D.draw(textShape);
+		if (lOutlineWidth > 0) {
+			BasicStroke outlineStroke = new BasicStroke(lOutlineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+			Color lOutlineColor = hex2Rgba(mFontOptions.outlineColorHex);
+			if (lOutlineColor == null) {
+				lOutlineColor = Color.black;
+			}
+			graphics2D.setColor(lOutlineColor);
+			graphics2D.setStroke(outlineStroke);
+			graphics2D.draw(textShape);
 
-		int testCol = 0xff0000ff;
-		
+		}
+
 		// fill
 		Color lFillColor = hex2Rgba(mFontOptions.fillColorHex);
-//		if (lFillColor == null) {
-//			lFillColor = Color.black;
-//		}
+		if (lFillColor == null) {
+			lFillColor = Color.black;
+		}
 		graphics2D.setPaint(lFillColor);
 		graphics2D.fill(textShape);
 
@@ -187,7 +191,15 @@ public class BitmapFont {
 	}
 
 	private static Color hex2Rgba(String colorStr) {
-		return new Color(Integer.valueOf(colorStr.substring(1, 3), 16), Integer.valueOf(colorStr.substring(3, 5), 16), Integer.valueOf(colorStr.substring(5, 7), 16), Integer.valueOf(colorStr.substring(7, 9), 16));
+		if (colorStr == null || colorStr.length() < 9)
+			return Color.magenta;
+
+		try {
+			return new Color(Integer.valueOf(colorStr.substring(1, 3), 16), Integer.valueOf(colorStr.substring(3, 5), 16), Integer.valueOf(colorStr.substring(5, 7), 16), Integer.valueOf(colorStr.substring(7, 9), 16));
+		} catch (NumberFormatException ex) {
+			return Color.magenta;
+		}
+
 	}
 
 }

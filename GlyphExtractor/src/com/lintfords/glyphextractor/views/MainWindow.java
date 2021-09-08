@@ -3,6 +3,7 @@ package com.lintfords.glyphextractor.views;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,6 +26,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.lintfords.glyphextractor.data.BitmapFont;
+import com.lintfords.glyphextractor.data.BitmapFontOptions;
 import com.lintfords.glyphextractor.presenters.IMainPresenter;
 import com.lintfords.glyphextractor.presenters.MainWindowPresenter;
 
@@ -57,6 +59,9 @@ public class MainWindow extends JFrame {
 	private JRadioButton mRadioButtonGlyphHex;
 	private JRadioButton mRadioButtonGlyphDec;
 	private JCheckBox mCheckBoxAntiAliasing;
+	private ImagePanel mPreviewImage;
+	private JTextField mTextAreaPreviewTextChar;
+	private JLabel mLabelPreviewTextCharUnicode;
 
 	private MainWindow mThisMainWindow = this;
 
@@ -96,6 +101,10 @@ public class MainWindow extends JFrame {
 		final int lVerticalSpacing = 30;
 		int lCurrentYPos = 20;
 
+		// Status label
+		mLabelStatus = new JLabel();
+		mLabelStatus.setBounds(0, 370, 570, 25);
+
 		createFontFilepathControls(lCurrentYPos);
 		createOutputFolderControls(lCurrentYPos += lVerticalSpacing);
 		createPointSizeControl(lCurrentYPos += lVerticalSpacing);
@@ -106,11 +115,25 @@ public class MainWindow extends JFrame {
 		createGlyphNamingControls(lCurrentYPos += lVerticalSpacing);
 		createAntiAliasingControls(lCurrentYPos += lVerticalSpacing);
 		createSpritePaddingControls(lCurrentYPos += lVerticalSpacing);
+		createPreviewImage();
+
+		// Buttons
+
+		lCurrentYPos += lVerticalSpacing * 1.5f;
+		// Reset Window
+		JButton lButtonReset = new JButton();
+		lButtonReset.setBounds(10, lCurrentYPos, 75, 25);
+		lButtonReset.setText("Reset");
+		lButtonReset.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				resetForm();
+			}
+		});
 
 		// Save Configuration
-		lCurrentYPos += lVerticalSpacing * 1.5f;
 		JButton lButtonSave = new JButton();
-		lButtonSave.setBounds(10, lCurrentYPos, 75, 25);
+		lButtonSave.setBounds(90, lCurrentYPos, 75, 25);
 		lButtonSave.setText("Save");
 		lButtonSave.addActionListener(new ActionListener() {
 			@Override
@@ -131,7 +154,7 @@ public class MainWindow extends JFrame {
 
 		// Load Configuration
 		JButton lButtonLoad = new JButton();
-		lButtonLoad.setBounds(90, lCurrentYPos, 75, 25);
+		lButtonLoad.setBounds(170, lCurrentYPos, 75, 25);
 		lButtonLoad.setText("Load");
 		lButtonLoad.addActionListener(new ActionListener() {
 			@Override
@@ -160,16 +183,44 @@ public class MainWindow extends JFrame {
 			}
 		});
 
-		// Status label
-		mLabelStatus = new JLabel();
-		mLabelStatus.setBounds(0, 370, 570, 25);
-
+		getContentPane().add(lButtonReset);
 		getContentPane().add(lButtonSave);
 		getContentPane().add(lButtonLoad);
 		getContentPane().add(lButtonExport);
 
 		getContentPane().add(mLabelStatus);
 
+	}
+
+	private void createPreviewImage() {
+		mTextAreaPreviewTextChar = new JTextField();
+		mLabelPreviewTextCharUnicode = new JLabel();
+		mPreviewImage = new ImagePanel();
+
+		mTextAreaPreviewTextChar.setBounds(425, 170, 25, 25);
+		mTextAreaPreviewTextChar.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void changedUpdate(DocumentEvent arg0) {
+				updatePreviewCharacter();
+			}
+
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				updatePreviewCharacter();
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				updatePreviewCharacter();
+			}
+		});
+		mTextAreaPreviewTextChar.setText("A");
+		mLabelPreviewTextCharUnicode.setBounds(455, 170, 25, 25);
+		mPreviewImage.setBounds(425, 200, 120, 120);
+
+		getContentPane().add(mTextAreaPreviewTextChar);
+		getContentPane().add(mLabelPreviewTextCharUnicode);
+		getContentPane().add(mPreviewImage);
 	}
 
 	private void createFontFilepathControls(int pYPosition) {
@@ -298,7 +349,7 @@ public class MainWindow extends JFrame {
 		});
 
 		mTextAreaUnicodeEnd = new JTextField();
-		mTextAreaUnicodeEnd.setBounds(COLUMN_2_X + 175 + 5, pYPosition, 75, 25);
+		mTextAreaUnicodeEnd.setBounds(COLUMN_2_X + 80, pYPosition, 75, 25);
 		mTextAreaUnicodeEnd.setText("127");
 		mTextAreaUnicodeEnd.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
@@ -358,7 +409,6 @@ public class MainWindow extends JFrame {
 
 		mTextAreaFillColor = new JTextField();
 		mTextAreaFillColor.setBounds(COLUMN_2_X, pYPosition, 100, 25);
-		mTextAreaFillColor.setText("0xFFFFFFFF");
 		mTextAreaFillColor.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void changedUpdate(DocumentEvent arg0) {
@@ -375,6 +425,7 @@ public class MainWindow extends JFrame {
 				updateFillColor();
 			}
 		});
+		mTextAreaFillColor.setText("#FFFFFFFF");
 
 		JButton lColorChooserFill = new JButton();
 		lColorChooserFill.setBounds(COLUMN_2_X + 110, pYPosition, 75, 25);
@@ -402,7 +453,6 @@ public class MainWindow extends JFrame {
 
 		mTextAreaOutlineColor = new JTextField();
 		mTextAreaOutlineColor.setBounds(COLUMN_2_X, pYPosition, 100, 25);
-		mTextAreaOutlineColor.setText("0x000000");
 		mTextAreaOutlineColor.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void changedUpdate(DocumentEvent arg0) {
@@ -419,6 +469,7 @@ public class MainWindow extends JFrame {
 				updateOutlineColor();
 			}
 		});
+		mTextAreaOutlineColor.setText("#000000FF");
 
 		JButton lColorChooserOutline = new JButton();
 		lColorChooserOutline.setBounds(COLUMN_2_X + 110, pYPosition, 75, 25);
@@ -583,7 +634,57 @@ public class MainWindow extends JFrame {
 		mTextAreaSpritePadding.setText(pSpritePadding);
 	}
 
+	public void setImagePreview(BufferedImage pImage) {
+		mPreviewImage.setBufferedImage(pImage);
+		invalidate();
+	}
+
 	// --------------------------------------
+
+	private void resetForm() {
+		Runnable doUpdatePreviewCharacter = new Runnable() {
+			@Override
+			public void run() {
+				mMainWindowPresenter.resetOptions();
+
+				BitmapFontOptions lOptions = mMainWindowPresenter.getBitmapFontOptions();
+
+				mTextAreaFontFilename.setText(lOptions.fontFilepath);
+				mTextAreaOutputFolder.setText(lOptions.outputFolder);
+				mTextAreaPointSize.setText(String.valueOf(lOptions.pointSize));
+				mTextAreaUnicodeStart.setText(String.valueOf(lOptions.unicodeStartCode));
+				mTextAreaUnicodeEnd.setText(String.valueOf(lOptions.unicodeEndCode));
+				mTextAreaFillColor.setText(lOptions.fillColorHex);
+				mTextAreaOutlineColor.setText(lOptions.outlineColorHex);
+				mCheckBoxAntiAliasing.setSelected(lOptions.useAntiAliasing);
+				mTextAreaSpritePadding.setText(String.valueOf(lOptions.spritePadding));
+				setImagePreview(null);
+			}
+		};
+		SwingUtilities.invokeLater(doUpdatePreviewCharacter);
+	}
+
+	private void updatePreviewCharacter() {
+		Runnable doUpdatePreviewCharacter = new Runnable() {
+			@Override
+			public void run() {
+				String lPreviewCharacter = mTextAreaPreviewTextChar.getText();
+				if (lPreviewCharacter.length() == 0) {
+					mMainWindowPresenter.setPreviewCharacter(' ');
+					mLabelPreviewTextCharUnicode.setText("");
+				} else if (lPreviewCharacter.length() > 1) {
+					lPreviewCharacter = lPreviewCharacter.substring(0, 1);
+					mTextAreaPreviewTextChar.setText(lPreviewCharacter);
+				} else if (lPreviewCharacter != null && lPreviewCharacter.length() == 1) {
+					char lPreviewChar = (char) lPreviewCharacter.charAt(0);
+					int lPreviewCharValue = (int) lPreviewChar;
+					mMainWindowPresenter.setPreviewCharacter(lPreviewChar);
+					mLabelPreviewTextCharUnicode.setText(String.valueOf(lPreviewCharValue));
+				}
+			}
+		};
+		SwingUtilities.invokeLater(doUpdatePreviewCharacter);
+	}
 
 	private void updateOutputFolder() {
 		Runnable doUpdateSpritePadding = new Runnable() {

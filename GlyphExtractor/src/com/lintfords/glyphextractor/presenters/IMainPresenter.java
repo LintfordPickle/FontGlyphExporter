@@ -2,7 +2,13 @@ package com.lintfords.glyphextractor.presenters;
 
 import java.io.File;
 
+import com.lintfords.glyphextractor.data.BitmapFontOptions;
+
 public interface IMainPresenter {
+	BitmapFontOptions getBitmapFontOptions();
+
+	void setPreviewCharacter(int pNewPreviewChar);
+
 	void setFontFilepath(File pNewFontFile);
 
 	void setOutputFolder(File pNewOutputFolder);
@@ -24,6 +30,8 @@ public interface IMainPresenter {
 	void setOutlineGlyphs(int pOutlineWidth);
 
 	void setFillColor(String pNewFillColorHex);
+
+	void resetOptions();
 
 	void setAntiAliasing(boolean pNewValue);
 

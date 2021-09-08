@@ -1,5 +1,7 @@
 package com.lintfords.glyphextractor;
 
+import java.io.File;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -59,7 +61,16 @@ public class BaseApp {
 
 		if (cmd.hasOption(CLI_OPTION_CONFIGURATION_FILE)) {
 			String lConfigurationFile = cmd.getOptionValue(CLI_OPTION_CONFIGURATION_FILE);
+			File lNewFile = new File(lConfigurationFile);
+			if (lNewFile.exists() == false) {
+				System.out.println("Configuration file couldn't be found : " + lConfigurationFile);
+				return;
+			}
 			BitmapFontOptions lBitmapOptions = BitmapFontOptions.fromConfigrationFile(lConfigurationFile);
+			if (lBitmapOptions == null) {
+				System.out.println("Error loading configuration file");
+				return;
+			}
 			if (BitmapFontOptions.validateInputOptions(lBitmapOptions) == false) {
 				System.out.println("Failed to validate the configuration file");
 				return;
