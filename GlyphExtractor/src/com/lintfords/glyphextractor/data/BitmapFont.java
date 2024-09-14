@@ -67,10 +67,13 @@ public class BitmapFont {
 		try {
 			FileInputStream lFileStream = new FileInputStream(lFontFile);
 			mFont = Font.createFont(Font.TRUETYPE_FONT, lFileStream);
-			mFont = mFont.deriveFont((float) mFontOptions.pointSize);
+
+			final int lFontStyle = pOptions.fontStyleBold ? Font.BOLD : Font.PLAIN;
+
+			final float convertDpiSize = (96.f / 72.f) * (float) mFontOptions.pointSize;
+			mFont = mFont.deriveFont(lFontStyle, convertDpiSize);
 
 			lFileStream.close();
-
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return;
@@ -143,12 +146,12 @@ public class BitmapFont {
 		graphics2D.setFont(mFont);
 		FontMetrics lFontMetrics = graphics2D.getFontMetrics();
 
+		final int lGlyphHBorder = 1;
 		final int lGlyphBorder = mFontOptions.spritePadding;
-
 		final int lOutlineWidth = (int) Math.ceil(mFontOptions.outlineSize);
 
-		int charWidth = lFontMetrics.charWidth(currentCharacter) + lGlyphBorder * 2 + lOutlineWidth * 2;
-		int charHeight = lFontMetrics.getHeight() + lGlyphBorder * 2 + lOutlineWidth * 2;
+		int charWidth = lFontMetrics.charWidth(currentCharacter) + lGlyphBorder * 2 + lOutlineWidth * 2 + lGlyphHBorder * 2;
+		int charHeight = (int) (lFontMetrics.getHeight() * 1.33f);// + lGlyphBorder * 2 + lOutlineWidth * 2;
 
 		// create a glyph vector from your text
 		GlyphVector glyphVector = mFont.createGlyphVector(graphics2D.getFontRenderContext(), String.valueOf(currentCharacter));
@@ -161,8 +164,10 @@ public class BitmapFont {
 
 		graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, mFontOptions.useAntiAliasing ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
 		graphics2D.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-		
-		graphics2D.translate(lGlyphBorder + lOutlineWidth, lGlyphBorder + lFontMetrics.getAscent() + lOutlineWidth);
+		// graphics2D.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+
+		final float lAscent = lFontMetrics.getAscent() * 1.33f;
+		graphics2D.translate(lGlyphBorder + lOutlineWidth + lGlyphHBorder, lAscent);
 
 		// Draw outline
 		if (lOutlineWidth > 0) {
@@ -174,7 +179,6 @@ public class BitmapFont {
 			graphics2D.setColor(lOutlineColor);
 			graphics2D.setStroke(outlineStroke);
 			graphics2D.draw(textShape);
-
 		}
 
 		// fill

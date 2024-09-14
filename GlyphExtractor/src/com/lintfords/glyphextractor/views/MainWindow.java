@@ -55,6 +55,7 @@ public class MainWindow extends JFrame {
 	private JTextField mTextAreaOutlineSize;
 	private JTextField mTextAreaFillColor;
 	private JTextField mTextAreaOutlineColor;
+	private JCheckBox mCheckBoxStyleBold;
 	private JTextField mTextAreaSpritePadding;
 	private JRadioButton mRadioButtonGlyphHex;
 	private JRadioButton mRadioButtonGlyphDec;
@@ -85,7 +86,7 @@ public class MainWindow extends JFrame {
 
 	private void createWindow() {
 		setTitle("Glyph Exporter");
-		setSize(570, 430);
+		setSize(570, 455);
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -103,12 +104,13 @@ public class MainWindow extends JFrame {
 
 		// Status label
 		mLabelStatus = new JLabel();
-		mLabelStatus.setBounds(0, 370, 570, 25);
+		mLabelStatus.setBounds(0, 390, 570, 25);
 
 		createFontFilepathControls(lCurrentYPos);
 		createOutputFolderControls(lCurrentYPos += lVerticalSpacing);
 		createPointSizeControl(lCurrentYPos += lVerticalSpacing);
 		createUnicodeRangeControls(lCurrentYPos += lVerticalSpacing);
+		createStyleControls(lCurrentYPos += lVerticalSpacing);
 		createOutlineGlyphsControls(lCurrentYPos += lVerticalSpacing);
 		createFillColorControls(lCurrentYPos += lVerticalSpacing);
 		createOutlineColorControls(lCurrentYPos += lVerticalSpacing);
@@ -446,6 +448,24 @@ public class MainWindow extends JFrame {
 		getContentPane().add(lColorChooserFill);
 	}
 
+	private void createStyleControls(int pYPosition) {
+		JLabel lLabelStyleBold = new JLabel();
+		lLabelStyleBold.setText("Bold");
+		lLabelStyleBold.setBounds(COLUMN_1_X, pYPosition, 130, 25);
+
+		mCheckBoxStyleBold = new JCheckBox();
+		mCheckBoxStyleBold.setBounds(COLUMN_2_X, pYPosition, 20, 20);
+		mCheckBoxStyleBold.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				mMainWindowPresenter.setStyleBold(mCheckBoxStyleBold.isSelected());
+			}
+		});
+
+		getContentPane().add(lLabelStyleBold);
+		getContentPane().add(mCheckBoxStyleBold);
+	}
+
 	private void createOutlineColorControls(int pYPosition) {
 		JLabel lLabelOutlineColor = new JLabel();
 		lLabelOutlineColor.setText("Outline Color");
@@ -595,6 +615,10 @@ public class MainWindow extends JFrame {
 
 	public void setFontFilename(String pFontFilepath) {
 		mTextAreaFontFilename.setText(pFontFilepath);
+	}
+
+	public void setStyleBold(boolean pBoldEnabled) {
+		mCheckBoxStyleBold.setSelected(pBoldEnabled);
 	}
 
 	public void setOutputFolder(String pOutputFolder) {

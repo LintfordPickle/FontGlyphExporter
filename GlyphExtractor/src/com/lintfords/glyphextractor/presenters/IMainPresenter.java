@@ -33,6 +33,8 @@ public interface IMainPresenter {
 
 	void resetOptions();
 
+	void setStyleBold(boolean pNewBoldValue);
+	
 	void setAntiAliasing(boolean pNewValue);
 
 	void setGlyphNamingConventionUseHex(boolean pUseHex);

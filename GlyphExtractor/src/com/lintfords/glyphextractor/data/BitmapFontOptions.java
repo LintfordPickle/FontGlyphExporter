@@ -33,6 +33,7 @@ public class BitmapFontOptions {
 	public String outlineColorHex;
 	public String fontFilepath;
 	public String outputFolder;
+	public boolean fontStyleBold;
 	public int pointSize;
 	public int spritePadding;
 	public int outlineSize;

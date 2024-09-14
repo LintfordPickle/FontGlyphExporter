@@ -98,6 +98,16 @@ public class MainWindowPresenter implements IMainPresenter {
 	}
 
 	@Override
+	public void setStyleBold(boolean pNewBoldValue) {
+		if (mBitmapFontOptions.fontStyleBold != pNewBoldValue) {
+			mBitmapFontOptions.fontStyleBold = pNewBoldValue;
+			mMainWindow.setStyleBold(pNewBoldValue);
+
+			validateAndPreview();
+		}
+	}
+
+	@Override
 	public void setAntiAliasing(boolean pNewValue) {
 		if (mBitmapFontOptions.useAntiAliasing != pNewValue) {
 			mBitmapFontOptions.useAntiAliasing = pNewValue;
@@ -313,6 +323,7 @@ public class MainWindowPresenter implements IMainPresenter {
 		mMainWindow.setFontFilename(lLoadedOptionsFile.fontFilepath);
 		mMainWindow.setOutputFolder(lLoadedOptionsFile.outputFolder);
 		mMainWindow.setPointSizeValue(String.valueOf(lLoadedOptionsFile.pointSize));
+		mMainWindow.setStyleBold(lLoadedOptionsFile.fontStyleBold);
 		mMainWindow.setUnicodeRangePoints(lLoadedOptionsFile.unicodeStartCode, lLoadedOptionsFile.unicodeEndCode);
 		mMainWindow.setOutlineGlyphs(String.valueOf(lLoadedOptionsFile.outlineSize));
 		mMainWindow.setFillColor(lLoadedOptionsFile.fillColorHex);
